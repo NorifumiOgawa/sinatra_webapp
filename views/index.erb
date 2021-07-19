@@ -1,0 +1,7 @@
+<ul>
+  <% @file_list.each_with_index do |file, i| %>
+  <li>
+    <a href="/memo/<%= file %>"><%= "#{h @memos[i]['title']}" %></a>
+  </li>
+  <% end %>
+</ul>

@@ -1,0 +1,17 @@
+<form method="post" action="/memo/">
+	<input type="hidden" name="_method" value="PATCH">
+	<input type="hidden" name="filename" value="<%= @filename %>">
+	<div class="form-items">
+		<div class="form-items__item">
+			<label>件名</label>
+			<input type= "text" name="title" value="<%= @memo['title'] %>">
+		</div>
+		<div class="form-items__item">
+			<label>内容</label>
+			<textarea name="body"><%= @memo['body'] %></textarea>
+			</div>
+		</div>
+	<div class="form-action">
+		<input type="submit" class="center" value="変更">
+	</div>
+</form>

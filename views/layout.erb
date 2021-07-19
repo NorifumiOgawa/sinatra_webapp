@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf8">
+<title><%= "#{@page_title} / MemoApp" %></title>
+<link rel="stylesheet" href="/style.css" />
+</head>
+ 
+<body>
+<article>
+	<div class="flexbox">
+		<div class="box-item">
+			<h1><a href='/'>メモアプリ</a></h1>	
+		</div>
+		<div class="box-item">
+			<% if @page_title == 'TOP' %>
+				<button type="button" class="right" onclick="location.href='/memo/new'">追加</button>
+			<% end %>
+		</div>
+	</div>
+	<div class="main-contents">
+		<%= yield %>
+	</div>
+</article>
+</body>
+</html>
