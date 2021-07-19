@@ -1,14 +1,14 @@
 <form method="post" action="/memo/">
 	<input type="hidden" name="_method" value="PATCH">
-	<input type="hidden" name="filename" value="<%= @filename %>">
+	<input type="hidden" name="filename" value="<%= @content['file_name'] %>">
 	<div class="form-items">
 		<div class="form-items__item">
 			<label>件名</label>
-			<input type= "text" name="title" value="<%= @memo['title'] %>">
+			<input type= "text" name="title" value="<%= @content['title'] %>">
 		</div>
 		<div class="form-items__item">
 			<label>内容</label>
-			<textarea name="body"><%= @memo['body'] %></textarea>
+			<textarea name="body"><%= @content['body'] %></textarea>
 			</div>
 		</div>
 	<div class="form-action">

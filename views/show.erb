@@ -1,16 +1,16 @@
 <div class="detail-content">
-	<h2><%= h @memo['title'] %></h2>
-	<p><%= h @memo['body'] %></p>
+	<h2><%= h @content['title'] %></h2>
+	<p><%= h @content['body'] %></p>
 </div>
 
 <div class="flexbox">
 	<div class="box-item">
-		<button type="button" class="center" onclick="location.href='/memo/<%= @filename %>/edit'">変更</button>
+		<button type="button" class="center" onclick="location.href='/memo/<%= @content['file_name'] %>/edit'">変更</button>
 	</div>
 	<div class="box-item">
 		<form method="post" action="/memo/" onSubmit="return confirm('削除しますか?'); ">
 			<input type="hidden" name="_method" value="DELETE">
-			<input type="hidden" name="filename" value="<%= @filename %>">
+			<input type="hidden" name="filename" value="<%= @content['file_name'] %>">
 			<input type="submit" class="center" value="削除">
 		</form>
 	</div>
