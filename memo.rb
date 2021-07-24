@@ -4,6 +4,7 @@ require 'sinatra'
 require 'sinatra/reloader'
 require 'logger'
 require 'json'
+require 'securerandom'
 
 helpers do
   def h(text)
@@ -19,17 +20,18 @@ get '/' do
   erb :index
 end
 
-get %r{/memo/(\d+)} do |file|
-  # メモを表示するページ
-  memo = Memo.new
-  @content = memo.read(file)
-  erb :show
-end
-
 get '/memo/new' do
   # 新しいメモを作成するページ
   @page_title = 'New memo'
   erb :new
+end
+
+get %r{/memo/([0-9a-z-]+)} do |id|
+  # メモを表示するページ
+  @id = id
+  memo = Memo.new
+  @content = memo.read(id)
+  erb :show
 end
 
 post '/memo/' do
@@ -39,25 +41,26 @@ post '/memo/' do
   redirect to('/')
 end
 
-get %r{/memo/(\d+)/edit} do |file|
+get %r{/memo/([0-9a-z-]+)/edit} do |id|
   # 既存のメモを編集するページ
   @page_title = 'Edit memo'
+  @id = id
   memo = Memo.new
-  @content = memo.read(file)
+  @content = memo.read(id)
   erb :edit
 end
 
-patch '/memo/' do
+patch %r{/memo/([0-9a-z-]+)} do |id|
   # 既存のメモを更新する
   memo = Memo.new
-  memo.save(filename: params['filename'], params: params)
-  redirect to("/memo/#{params['filename']}")
+  memo.save(id: id, params: params)
+  redirect to("/memo/#{id}")
 end
 
-delete '/memo/' do
+delete %r{/memo/([0-9a-z-]+)} do |id|
   # 既存のメモを削除する
   memo = Memo.new
-  memo.delete(params['filename'])
+  memo.delete(id)
   redirect to('/')
 end
 
@@ -81,23 +84,23 @@ class Memo
     memos
   end
 
-  def read(file)
+  def read(id)
     memo = ''
-    File.open("./data/#{file}") do |f|
+    File.open("./data/#{id.gsub(/[\.|\/|\\]+/, '')}") do |f|
       memo = JSON.parse(f.read)
-      memo['file_name'] = file
+      memo['file_name'] = id
     end
     memo
   end
 
-  def save(filename: Time.now.to_i.to_s, params: [])
-    File.open("./data/#{filename}", 'w') do |file|
+  def save(id: SecureRandom.uuid, params: [])
+    File.open("./data/#{id.gsub(/[\.|\/|\\]+/, '')}", 'w') do |file|
       json = { title: params['title'], body: params['body'] }
       JSON.dump(json, file)
     end
   end
 
-  def delete(file)
-    File.delete("./data/#{file}")
+  def delete(id)
+    File.delete("./data/#{id.gsub(/[\.|\/|\\]+/, '')}")
   end
 end
