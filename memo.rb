@@ -72,19 +72,18 @@ end
 class Memo
   def list
     file_list = Dir.glob('*', base: './data/')
-    file_list.map! do |file|
+    file_list.map do |file|
       File.open("./data/#{file}") do |f|
         title_text = JSON.parse(f.read)['title']
         title_text = 'NO TITLE' if title_text == ''
-        {'title' => title_text, 'file_name' => file}
+        { 'title' => title_text, 'file_name' => file }
       end
     end
-    file_list
   end
 
   def read(id)
     memo = ''
-    File.open("./data/#{id.gsub(/[\.|\/|\\]+/, '')}") do |f|
+    File.open("./data/#{path_cut(id)}") do |f|
       memo = JSON.parse(f.read)
       memo['file_name'] = id
     end
@@ -92,13 +91,17 @@ class Memo
   end
 
   def save(id: SecureRandom.uuid, params: [])
-    File.open("./data/#{id.gsub(/[\.|\/|\\]+/, '')}", 'w') do |file|
+    File.open("./data/#{path_cut(id)}", 'w') do |file|
       json = { title: params['title'], body: params['body'] }
       JSON.dump(json, file)
     end
   end
 
   def delete(id)
-    File.delete("./data/#{id.gsub(/[\.|\/|\\]+/, '')}")
+    File.delete("./data/#{path_cut(id)}")
+  end
+
+  def path_cut(id)
+    id.gsub(%r{[.|/|\\]+}, '')
   end
 end
