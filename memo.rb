@@ -71,17 +71,15 @@ end
 
 class Memo
   def list
-    memos = []
     file_list = Dir.glob('*', base: './data/')
-    file_list.each do |file|
+    file_list.map! do |file|
       File.open("./data/#{file}") do |f|
-        hash = JSON.parse(f.read)
-        hash['title'] = 'NO TITLE' if hash['title'] == ''
-        hash['file_name'] = file
-        memos << hash
+        title_text = JSON.parse(f.read)['title']
+        title_text = 'NO TITLE' if title_text == ''
+        {'title' => title_text, 'file_name' => file}
       end
     end
-    memos
+    file_list
   end
 
   def read(id)
