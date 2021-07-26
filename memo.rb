@@ -2,9 +2,8 @@
 
 require 'sinatra'
 require 'sinatra/reloader'
-require 'logger'
-require 'json'
 require 'securerandom'
+require 'pg'
 
 helpers do
   def h(text)
@@ -28,9 +27,9 @@ end
 
 get %r{/memo/([0-9a-z-]+)} do |id|
   # メモを表示するページ
-  @id = id
   memo = Memo.new
-  @content = memo.read(id)
+  @content = memo.read(id)[0]
+  @page_title = @content['title']
   erb :show
 end
 
@@ -44,9 +43,8 @@ end
 get %r{/memo/([0-9a-z-]+)/edit} do |id|
   # 既存のメモを編集するページ
   @page_title = 'Edit memo'
-  @id = id
   memo = Memo.new
-  @content = memo.read(id)
+  @content = memo.read(id)[0]
   erb :edit
 end
 
@@ -70,38 +68,27 @@ not_found do
 end
 
 class Memo
+  def initialize
+    @conn = PG.connect(dbname: ENV['PGDATABASE'])
+  end
+
   def list
-    file_list = Dir.glob('*', base: './data/')
-    file_list.map do |file|
-      File.open("./data/#{file}") do |f|
-        title_text = JSON.parse(f.read)['title']
-        title_text = 'NO TITLE' if title_text == ''
-        { 'title' => title_text, 'file_name' => file }
-      end
-    end
+    @conn.exec('SELECT * FROM memo')
   end
 
   def read(id)
-    memo = ''
-    File.open("./data/#{path_cut(id)}") do |f|
-      memo = JSON.parse(f.read)
-      memo['file_name'] = id
-    end
-    memo
+    @conn.exec('SELECT * FROM memo WHERE id=$1', [id])
   end
 
-  def save(id: SecureRandom.uuid, params: [])
-    File.open("./data/#{path_cut(id)}", 'w') do |file|
-      json = { title: params['title'], body: params['body'] }
-      JSON.dump(json, file)
+  def save(id: nil, params: [])
+    if id
+      @conn.exec('UPDATE memo SET title=$1, body=$2 WHERE id=$3', [params['title'], params['body'], id])
+    else
+      @conn.exec('INSERT INTO memo (title, body) VALUES ($1, $2)', [params['title'], params['body']])
     end
   end
 
   def delete(id)
-    File.delete("./data/#{path_cut(id)}")
-  end
-
-  def path_cut(id)
-    id.gsub(%r{[.|/|\\]+}, '')
+    @conn.exec('DELETE FROM memo WHERE id=$1', [id])
   end
 end

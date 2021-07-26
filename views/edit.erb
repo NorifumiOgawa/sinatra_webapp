@@ -1,13 +1,13 @@
-<form method="post" action="/memo/<%= @id %>">
+<form method="post" action="/memo/<%= @content['id'] %>">
   <input type="hidden" name="_method" value="PATCH">
   <div class="form-items">
     <div class="form-items__item">
       <label>件名</label>
-      <input type= "text" name="title" value="<%= @content['title'] %>">
+      <input type= "text" name="title" value="<%= h @content['title'] %>">
     </div>
     <div class="form-items__item">
       <label>内容</label>
-      <textarea name="body"><%= @content['body'] %></textarea>
+      <textarea name="body"><%= h @content['body'] %></textarea>
     </div>
   </div>
   <div class="form-action">
